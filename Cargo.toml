@@ -8,10 +8,16 @@ description = "A cryptographically verifiable data store and universal accumulat
 repository = "https://github.com/spacesprotocol/spacedb"
 license = "Apache-2.0"
 
+[[bin]]
+name = "sdb"
+path = "src/bin/sdb.rs"
+required-features = ["sdb-tool"]
+
 [dependencies]
 libc = { version = "0.2.150", optional = true }
 bincode = { version = "2.0.0-rc.3", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.3", optional = true }
+clap = { version = "4.5.20", features = ["derive"], optional = true }
 
 [dev-dependencies]
 rand = "0.8.5"
@@ -24,3 +30,4 @@ default-features = false
 [features]
 default = ["std"]
 std = ["libc", "hex", "bincode/derive", "bincode/std"]
+sdb-tool = ["clap"]
