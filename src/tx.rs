@@ -518,9 +518,18 @@ impl<H: NodeHasher> ReadTransaction<H> {
                 left,
                 right,
             } => {
-                // Exclude keys that are not in this subtree.
-                let end = keys.partition_point(|key| key.split_point(depth, *prefix).is_none());
-                let keys = &keys[..end];
+                // Exclude keys that are not in this subtree. Sorted keys that
+                // diverge below the prefix come before the matching band, ones
+                // that diverge above come after — trim both sides.
+                let start = keys.partition_point(|key| {
+                    key.split_point(depth, *prefix)
+                        .is_some_and(|p| key.direction(depth + p) == Direction::Left)
+                });
+                let end = keys.partition_point(|key| {
+                    key.split_point(depth, *prefix)
+                        .is_none_or(|p| key.direction(depth + p) == Direction::Left)
+                });
+                let keys = &keys[start..end];
 
                 // Keys are split based on their direction at the current depth.
                 let depth = depth + prefix.bit_len();
@@ -611,6 +620,9 @@ impl<H: NodeHasher> ReadTransaction<H> {
         }
     }
 
+    // `hash_index` is read directly only under the `hash-idx` feature;
+    // without it, clippy sees a recursion-only parameter.
+    #[cfg_attr(not(feature = "hash-idx"), allow(clippy::only_used_in_recursion))]
     fn hash_node<'c>(
         db: &Database<H>,
         cache: &mut Cache,

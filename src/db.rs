@@ -12,7 +12,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-const HEADER_MAGIC: [u8; 9] = [b's', b'p', b'a', b'c', b'e', b':', b'/', b'/', b'.'];
+const HEADER_MAGIC: [u8; 9] = *b"space://.";
 pub(crate) const CHUNK_SIZE: u64 = 4096;
 pub(crate) const HEADER_SIZE: u64 = CHUNK_SIZE * 2;
 
