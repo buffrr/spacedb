@@ -620,6 +620,9 @@ impl<H: NodeHasher> ReadTransaction<H> {
         }
     }
 
+    // `hash_index` is read directly only under the `hash-idx` feature;
+    // without it, clippy sees a recursion-only parameter.
+    #[cfg_attr(not(feature = "hash-idx"), allow(clippy::only_used_in_recursion))]
     fn hash_node<'c>(
         db: &Database<H>,
         cache: &mut Cache,
